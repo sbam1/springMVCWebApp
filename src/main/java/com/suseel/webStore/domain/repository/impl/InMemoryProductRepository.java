@@ -1,7 +1,10 @@
 package com.suseel.webStore.domain.repository.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
@@ -39,12 +42,66 @@ public class InMemoryProductRepository implements ProductRepository {
 	}
 
 	public Product getProductById(String productID) {
-		 return (Product) listOfProducts.stream().map(product -> {
-			 if(product.getProductId().equals(productID)){
-				 return product;
-			 }
-			return product;
-		 }).collect(Collectors.toList()).get(0);
+		for(Product product :listOfProducts) {
+			if(product.getProductId().equalsIgnoreCase(productID)) {
+				return product;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<Product> getProductsByCategory(String category) {
+		List<Product> result = new ArrayList<Product>();
+		for(Product product : listOfProducts) {
+			if(category.equalsIgnoreCase(product.getCategory())){
+				System.out.println("----------------->>> category added");
+				result.add(product);
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
+	public List<Product> getProductsByFilter(Map<String, List<String>>
+	filterParams) {
+		List<Product> productsByBrand = new ArrayList<Product>();
+		List<Product> productsByCategory = new ArrayList<Product>();
+		Set<String> criterias = filterParams.keySet();
+		if(criterias.contains("brand")) {
+			for(String brandName: filterParams.get("brand")) {
+				for(Product product: listOfProducts) {
+					if(brandName.equalsIgnoreCase(product.getManufacturer())){
+						productsByBrand.add(product);
+					}
+				}	
+			}
+		}
+		if(criterias.contains("category")) {
+			for(String category: filterParams.get("category")) {
+				productsByCategory.addAll(this.getProductsByCategory(category));
+			}
+		}
+		productsByCategory.addAll(productsByBrand);
+	return productsByCategory;
+	}
+
+	@Override
+	public List<Product> getProductsByManufacturer(String manufacturer) {
+		List<Product> result = new ArrayList<Product>();
+		for(Product product : listOfProducts){
+			if(product.getManufacturer().equalsIgnoreCase(manufacturer)) {
+				result.add(product);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public void addProduct(Product product) {
+		this.getAllProducts().add(product);
+		
 	}
 
 }

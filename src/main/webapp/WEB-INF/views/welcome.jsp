@@ -14,6 +14,7 @@ bootstrap/3.0.0/css/bootstrap.min.css">
 			<div class="container">
 				<h1>${greeting}</h1>
 				<p>${tagline}</p>
+				<h3>${errorMessage}</h3>
 			</div>
 		</div>
 	</section>
